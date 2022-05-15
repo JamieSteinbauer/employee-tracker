@@ -138,6 +138,56 @@ addEmployee = () => {
     })
 }
 
+const userQuestions = () => {
+    inquirer.prompt([
+        {
+        type: 'list',
+        name: 'choice',
+        message: 'What would you like to do?',
+        choices: [
+            'View all employees',
+            'View all roles',
+            'View all departments',
+            'View all employees by department',
+            'Update employee role',
+            'Add department',
+            'Add role',
+            'Add employee'
+        ]
+        }
+    ])
+    .then((answer) => {
+        switch (answer.choice) {
+            case 'View all employees':
+                viewEmployees();
+                break;
+            case 'View all roles':
+                viewRoles();
+                break;
+            case 'View all departments':
+                viewDepartments();
+                break;
+            case 'View employees by department':
+                employeeDepartment();
+                break;
+            case 'Update employee role':
+                updateEmployeeRole();
+                break;
+            case 'Add employee':
+                addEmployee();
+                break;
+            case 'Add role':
+                addRole();
+                break;
+            case 'Add department':
+                addDepartment();
+                break;
+        }
+    })
+}
+
+userQuestions();
+
 
 // get all employees
 app.get('/api/employee', (req, res) => {
@@ -223,6 +273,8 @@ const addRole = () => {
         })
     })
 }
+
+
 
 // get single employee with id
 app.get('/api/employee/:id', (req, res) => {
