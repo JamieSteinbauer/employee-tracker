@@ -17,7 +17,7 @@ CREATE TABLE role (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NOT NULL,
-    department_id INT NOT NULL,
+    department_id INT,
     CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE SET NULL
 );
 
@@ -37,7 +37,7 @@ VALUES
     ("Sales"),
     ("Engineering"),
     ("Finance"),
-    ("Legal")
+    ("Legal");
 
 
 -- ROLE SEEDS --
@@ -50,20 +50,20 @@ VALUES
     ('Account Manager', 160000, 3),
     ('Accountant', 125000, 3),
     ('Legal Team Lead', 250000, 4),
-    ('Lawyer', 190000, 4)
+    ('Lawyer', 190000, 4);
 
     
 -- EMPLOYEE SEEDS --
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES
-    ('John', 'Smith', 1, null)
+    ('John', 'Smith', 1, null),
     ('Mike', 'Chan', 2, 1),
     ('Ashley', 'Rodriguez', 3, null),
     ('Kevin', 'Tupik', 4, 3),
     ('Kunal', 'Singh', 5, null),
     ('Malia', 'Brown', 6, 5),
     ('Sarah', 'Lourd', 7, null),
-    ('Tom', 'Allen', 8, 7)
+    ('Tom', 'Allen', 8, 7);
 
 
 

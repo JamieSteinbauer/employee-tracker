@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const db = require('./db/connection');
 const apiRoutes = require('./routes/apiRoutes');
-const consoleTable = require('console.table');
+const cTable = require('console.table');
 
 
 const PORT = process.env.PORT || 3001;
