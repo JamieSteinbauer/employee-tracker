@@ -138,73 +138,7 @@ addEmployee = () => {
     })
 }
 
-const userQuestions = () => {
-    inquirer.prompt([
-        {
-        type: 'list',
-        name: 'choice',
-        message: 'What would you like to do?',
-        choices: [
-            'View all employees',
-            'View all roles',
-            'View all departments',
-            'View all employees by department',
-            'Update employee role',
-            'Add department',
-            'Add role',
-            'Add employee'
-        ]
-        }
-    ])
-    .then((answer) => {
-        switch (answer.choice) {
-            case 'View all employees':
-                viewEmployees();
-                break;
-            case 'View all roles':
-                viewRoles();
-                break;
-            case 'View all departments':
-                viewDepartments();
-                break;
-            case 'View employees by department':
-                employeeDepartment();
-                break;
-            case 'Update employee role':
-                updateEmployeeRole();
-                break;
-            case 'Add employee':
-                addEmployee();
-                break;
-            case 'Add role':
-                addRole();
-                break;
-            case 'Add department':
-                addDepartment();
-                break;
-        }
-    })
-}
-
-userQuestions();
-
-
-// get all employees
-app.get('/api/employee', (req, res) => {
-    const sql = `SELECT * from employee`;
-
-    db.query(sql, (err, rows) => {
-        if(err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({
-            message: 'sucess',
-            data: rows
-        });
-    });
-});
-
+// add department function
 const addDepartment = () => {
     inquirer.prompt([
         {
@@ -226,6 +160,7 @@ const addDepartment = () => {
     })
 }
 
+// add role function
 const addRole = () => {
     db.query(`SELECT * FROM department`, function(err, res) {
         if (err) throw err;
@@ -274,68 +209,119 @@ const addRole = () => {
     })
 }
 
-
-
-// get single employee with id
-app.get('/api/employee/:id', (req, res) => {
-    const sql = `SELECT * FROM employee WHERE id = ?`;
-    const params = [req.params.id];
-
-    db.query(sql, params, (err, row) => {
-        if(err) {
-            res.status(400).json({ error: err.message });
-            return;
+// function to update employee role
+updateEmployeeRole = () => {
+    var sql = `SELECT * FROM employee`;
+  
+    db.query(sql, (err, data) => {
+      if (err) throw err; 
+  
+    const employees = data.map(({ 
+        id, first_name, last_name 
+        }) => ({ 
+        name: first_name + " "+ last_name, value: id 
+        }));
+  
+      inquirer.prompt([
+        {
+          type: 'list',
+          name: 'name',
+          message: "Which employee would you like to update?",
+          choices: employees
         }
-        res.json({
-            message: 'success',
-            data: row
-        });
-    });
-});
-
-// create an employee
-app.post('/api/employee', ({ body }, res) => {
-    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
-    const params = [
-        body.first_name, 
-        body.last_name, 
-        body.role_id, 
-        body.manager_id
-    ];
-
-    db.query(sql, params, (err, result) => {
-        if(err) {
-            res.status(400).json({ error: err.message });
-            return;
-        }
-        res.json({
-            message: 'success',
-            data: body,
-            changes: result.affectedRows
-        });
-    });
-});
-
-//delete an employee
-app.delete('/api/employee/:id', (req, res) => {
-    const sql = `DELETE FROM employee WHERE id = ?`;
-    const params = [req.params.id];
-    db.query(sql, params, (err, result) => {
-        if (err) {
-            res.statusMessage(404).json({ error: res.message });  
-        } else if (!result.affectedRows) {
-            res.json({
-                messgae: 'Candidate not found'
-            })
-        } else {
-            res.json({
-                message: 'deleted',
-                changes: result.affectedRows,
-                id: req.params.id
+      ])
+        .then(empChoice => {
+          const employee = empChoice.name;
+          const params = []; 
+          params.push(employee);
+  
+          const roleSql = `SELECT * FROM role`;
+  
+          db.query(roleSql, (err, data) => {
+            if (err) throw err; 
+  
+            const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+            
+              inquirer.prompt([
+                {
+                  type: 'list',
+                  name: 'role',
+                  message: "What is the employee's new role?",
+                  choices: roles
+                }
+              ])
+                  .then(roleChoice => {
+                  const role = roleChoice.role;
+                  params.push(role); 
+                  
+                  let employee = params[0]
+                  params[0] = role
+                  params[1] = employee 
+                  
+  
+                  var updateRole = `UPDATE employee SET role_id = ? WHERE id = ?`;
+  
+                  db.query(updateRole, params, (err, result) => {
+                    if (err) throw err;
+                  console.log("Employee's role has been updated");
+                
+                  userQuestions();
             });
-        }
+          });
+        });
+      });
     });
-});
+};
 
 
+// function for prompting the user
+const userQuestions = () => {
+    inquirer.prompt([
+        {
+        type: 'list',
+        name: 'choice',
+        message: 'What would you like to do?',
+        choices: [
+            'View all employees',
+            'View all roles',
+            'View all departments',
+            'View all employees by department',
+            'Update employee role',
+            'Add department',
+            'Add role',
+            'Add employee'
+        ]
+        }
+    ])
+    .then((answer) => {
+        switch (answer.choice) {
+            case 'View all employees':
+                viewEmployees();
+                break;
+            case 'View all roles':
+                viewRoles();
+                break;
+            case 'View all departments':
+                viewDepartments();
+                break;
+            case 'View employees by department':
+                employeeDepartment();
+                break;
+            case 'Update employee role':
+                updateEmployeeRole();
+                break;
+            case 'Add employee':
+                addEmployee();
+                break;
+            case 'Add role':
+                addRole();
+                break;
+            case 'Add department':
+                addDepartment();
+                break;
+        }
+    })
+}
 
+
+userQuestions();
