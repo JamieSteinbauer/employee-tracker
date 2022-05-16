@@ -122,7 +122,7 @@ addEmployee = () => {
                           const manager = managerChoice.manager;
                           params.push(manager);
 
-                          const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id
+                          const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
                             VALUES (?, ?, ?, ?)`;
 
                             db.query(sql, params, (err, result) => {
